@@ -24,6 +24,28 @@
 		- Register accessability check
 		- Configures a known bitcoin block with initial nonce, and runs until valid hash is found.
 */
+#define reg_btc_config      (*(volatile uint32_t*) (0x30000000))
+#define reg_btc_version     (*(volatile uint32_t*) (0x30000004))
+#define reg_btc_prev_hash_0 (*(volatile uint32_t*) (0x30000008))
+#define reg_btc_prev_hash_1 (*(volatile uint32_t*) (0x3000000C))
+#define reg_btc_prev_hash_2 (*(volatile uint32_t*) (0x30000010))
+#define reg_btc_prev_hash_3 (*(volatile uint32_t*) (0x30000014))
+#define reg_btc_prev_hash_4 (*(volatile uint32_t*) (0x30000018))
+#define reg_btc_prev_hash_5 (*(volatile uint32_t*) (0x3000001C))
+#define reg_btc_prev_hash_6 (*(volatile uint32_t*) (0x30000020))
+#define reg_btc_prev_hash_7 (*(volatile uint32_t*) (0x30000024))
+#define reg_btc_merkle_0    (*(volatile uint32_t*) (0x30000028))
+#define reg_btc_merkle_1    (*(volatile uint32_t*) (0x3000002C))
+#define reg_btc_merkle_2    (*(volatile uint32_t*) (0x30000030))
+#define reg_btc_merkle_3    (*(volatile uint32_t*) (0x30000034))
+#define reg_btc_merkle_4    (*(volatile uint32_t*) (0x30000038))
+#define reg_btc_merkle_5    (*(volatile uint32_t*) (0x3000003C))
+#define reg_btc_merkle_6    (*(volatile uint32_t*) (0x30000040))
+#define reg_btc_merkle_7    (*(volatile uint32_t*) (0x30000044))
+#define reg_btc_time        (*(volatile uint32_t*) (0x30000048))
+#define reg_btc_bits        (*(volatile uint32_t*) (0x3000004C))
+#define reg_btc_nonce       (*(volatile uint32_t*) (0x30000050))
+#define reg_btc_status      (*(volatile uint32_t*) (0x30000054))
 
 void main()
 {
@@ -66,9 +88,9 @@ void main()
     // Flag start of the test
 	reg_mprj_datal = 0xAB600000;
 
-    reg_mprj_slave = 0x00002710;
-    reg_mprj_datal = 0xAB610000;
-    if (reg_mprj_slave == 0x2B3D) {
+    reg_btc_config = 0x00000003;
+
+    if (reg_btc_config == 0x0000003) {
         reg_mprj_datal = 0xAB610000;
     }
 }
