@@ -130,7 +130,7 @@ module BtcMinerCore #(
   reg [1:0] state;
 
   // Core 0 chunk inputs
-  always_comb begin
+  always @(*) begin
     if (state == 2'd0) begin
       core_0_chunk_0  = version;
       core_0_chunk_1  = previous_hash_0;
@@ -173,10 +173,10 @@ module BtcMinerCore #(
   assign timeout = !(nonce < NONCE_MAX);
 
   // (very) Simplistic nonce found
-  always_comb nonce_found = (core_1_hash_7 == 32'd0);
+  always @(*) nonce_found = (core_1_hash_7 == 32'd0);
 
   // Core control signals
-  always_comb begin
+  always @(*) begin
     core_0_valid = start || (state != 2'd0 && core_0_ready);
     core_0_load_init = (state != 2'd0 && core_0_ready);
     core_1_valid = (state == 2'd2 && core_0_ready) ||

@@ -85,7 +85,7 @@ module BtcMinerRegs #(
   assign wbRty = 1'b0;
 
   // Wishbone ack
-  always_ff @(posedge clk) begin
+  always @(posedge clk) begin
     if (wbRst) begin
       wbAck <= 1'b0;
     end else begin
@@ -94,7 +94,7 @@ module BtcMinerRegs #(
   end
 
   // Wishbone read
-  always_ff @(posedge clk) begin
+  always @(posedge clk) begin
     if (wbRst) begin
       wbRData <= 32'd0;
     end else begin
@@ -130,7 +130,7 @@ module BtcMinerRegs #(
   end
 
   // Wishbone write
-  always_ff @(posedge clk) begin
+  always @(posedge clk) begin
     if (wbRst) begin
       config_use_nonce_in <= 1'b0;
       config_oneshot <= 1'b0;

@@ -58,9 +58,9 @@ module BtcMiner (
   assign nonce_found = |(nonce_found_per_core);
 
   // Set nonce to the (last) nonce found
-  always_comb begin
+  always @(*) begin
     nonce = 32'd0;
-    for (int i=0; i<NUM_CORES; i=i+1) begin
+    for (integer i=0; i<NUM_CORES; i=i+1) begin
       if (nonce_found_per_core[i]) begin
         nonce = nonce_per_core[i];
       end
