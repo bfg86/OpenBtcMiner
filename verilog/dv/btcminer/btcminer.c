@@ -88,9 +88,41 @@ void main()
     // Flag start of the test
 	reg_mprj_datal = 0xAB600000;
 
-    reg_btc_config = 0x00000003;
+    // Configure BtcMiner to use the initial nonce
+    reg_btc_config = 1;
 
-    if (reg_btc_config == 0x0000003) {
+    // This is the header for block height 125552
+    reg_btc_version     = 0x01000000;
+    reg_btc_prev_hash_0 = 0x81CD02AB;
+    reg_btc_prev_hash_1 = 0x7E569E8B;
+    reg_btc_prev_hash_2 = 0xCD9317E2;
+    reg_btc_prev_hash_3 = 0xFE99F2DE;
+    reg_btc_prev_hash_4 = 0x44D49AB2;
+    reg_btc_prev_hash_5 = 0xB8851BA4;
+    reg_btc_prev_hash_6 = 0xA3080000;
+    reg_btc_prev_hash_7 = 0x00000000;
+    reg_btc_merkle_0    = 0xE320B6C2;
+    reg_btc_merkle_1    = 0xFFFC8D75;
+    reg_btc_merkle_2    = 0x0423DB8B;
+    reg_btc_merkle_3    = 0x1EB942AE;
+    reg_btc_merkle_4    = 0x710E951E;
+    reg_btc_merkle_5    = 0xD797F7AF;
+    reg_btc_merkle_6    = 0xFC8892B0;
+    reg_btc_merkle_7    = 0xF1FC122B;    
+    reg_btc_time        = 0xC7F5D74D;
+    reg_btc_bits        = 0xF2B9441A;
+
+    // Set the initial nonce. The real nonce is 0x42a14695 (0x9546a142 reversed)
+    reg_btc_nonce = 0x42a14693;
+
+    // Start hashing
+    reg_btc_status = 1;    
+
+    // Wait for done flag
+    while (reg_btc_status == 0);
+
+    // Check nonce value and signal test end
+    if (reg_btc_nonce == 0x42a14695) {
         reg_mprj_datal = 0xAB610000;
     }
 }
