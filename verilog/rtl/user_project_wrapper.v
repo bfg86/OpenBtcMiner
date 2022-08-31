@@ -82,40 +82,30 @@ module user_project_wrapper #(
 /* User project is instantiated  here   */
 /*--------------------------------------*/
 
-user_proj_example mprj (
+BtcMiner u_Miner (
 `ifdef USE_POWER_PINS
 	.vccd1(vccd1),	// User area 1 1.8V power
 	.vssd1(vssd1),	// User area 1 digital ground
 `endif
 
-    .wb_clk_i(wb_clk_i),
-    .wb_rst_i(wb_rst_i),
+    .clk    (wb_clk_i),
+    .arst   (1'b0),
+    .wb_rst (wb_rst_i),
 
     // MGMT SoC Wishbone Slave
 
-    .wbs_cyc_i(wbs_cyc_i),
-    .wbs_stb_i(wbs_stb_i),
-    .wbs_we_i(wbs_we_i),
-    .wbs_sel_i(wbs_sel_i),
-    .wbs_adr_i(wbs_adr_i),
-    .wbs_dat_i(wbs_dat_i),
-    .wbs_ack_o(wbs_ack_o),
-    .wbs_dat_o(wbs_dat_o),
-
-    // Logic Analyzer
-
-    .la_data_in(la_data_in),
-    .la_data_out(la_data_out),
-    .la_oenb (la_oenb),
-
-    // IO Pads
-
-    .io_in (io_in),
-    .io_out(io_out),
-    .io_oeb(io_oeb),
-
-    // IRQ
-    .irq(user_irq)
+    .wb_cycle  (wbs_cyc_i),
+    .wb_strobe (wbs_stb_i),
+    .wb_we     (wbs_we_i),
+    .wb_sel    (wbs_sel_i),
+    .wb_addr   (wbs_adr_i),
+    .wb_wdata  (wbs_dat_i),
+    .wb_ack    (wbs_ack_o),
+    .wb_rdata  (wbs_dat_o),
+    .wb_cti    (3'b000),
+    .wb_bte    (2'b00),
+    .wb_err    (),
+    .wb_rty    ()
 );
 
 endmodule	// user_project_wrapper
