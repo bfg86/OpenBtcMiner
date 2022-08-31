@@ -1,5 +1,10 @@
 # Caravel user project includes
 -v $(USER_PROJECT_VERILOG)/rtl/user_project_wrapper.v	     
--v $(USER_PROJECT_VERILOG)/rtl/user_proj_example.v
+-v $(USER_PROJECT_VERILOG)/rtl/Sha256.v
+-v $(USER_PROJECT_VERILOG)/rtl/Sha256KeyMem.v
+-v $(USER_PROJECT_VERILOG)/rtl/BtcMinerCore.v
+-v $(USER_PROJECT_VERILOG)/rtl/BtcMinerUart.v
+-v $(USER_PROJECT_VERILOG)/rtl/BtcMinerRegs.v
+-v $(USER_PROJECT_VERILOG)/rtl/BtcMiner.v
 
  
