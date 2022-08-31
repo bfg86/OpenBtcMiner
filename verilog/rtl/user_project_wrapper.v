@@ -89,7 +89,7 @@ BtcMiner u_Miner (
 `endif
 
     .clk    (wb_clk_i),
-    .arst   (1'b0),
+    .arst   (wb_rst_i),
     .wb_rst (wb_rst_i),
 
     // MGMT SoC Wishbone Slave
@@ -98,7 +98,7 @@ BtcMiner u_Miner (
     .wb_strobe (wbs_stb_i),
     .wb_we     (wbs_we_i),
     .wb_sel    (wbs_sel_i),
-    .wb_addr   (wbs_adr_i),
+    .wb_addr   (wbs_adr_i[7:0]),
     .wb_wdata  (wbs_dat_i),
     .wb_ack    (wbs_ack_o),
     .wb_rdata  (wbs_dat_o),
