@@ -1,6 +1,4 @@
-module BtcMinerUart #(
-
-) (
+module BtcMinerUart (
     input  clk,
     input  rst,
     input  uart_rx,

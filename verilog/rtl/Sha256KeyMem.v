@@ -5,10 +5,10 @@ module Sha256KeyMem (
     output reg [31:0] k
 );
 
-  reg [31:0] k_mem  [63];
+  reg [31:0] k_mem  [0:63];
   // reg [ 5:0] k_addr;
 
-  always_comb begin
+  always @(*) begin
     case (k_addr)
     00: k = 32'h428a2f98;
     01: k = 32'h71374491;

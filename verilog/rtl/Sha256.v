@@ -55,9 +55,9 @@ module Sha256 (
 
 );
 
-  wire [31:0] chunk [16];
-  reg  [31:0] hash [8];
-  reg [31:0] w [16];
+  wire [31:0] chunk [0:15];
+  reg  [31:0] hash [0:7];
+  reg [31:0] w [0:15];
   wire [31:0] w_i_q, w_i_d;
   reg [31:0] a, b, c, d, e, f, g, h;
   reg [31:0] s0_ext, s1_ext, s0_comp, s1_comp;
@@ -107,12 +107,12 @@ module Sha256 (
   assign w_i_q = w[15];
   assign w_i_d = w[0] + s0_ext + w[9] + s1_ext;
 
-  always_comb begin : la_ExtendComb
+  always @(*) begin : la_ExtendComb
     s0_ext = (right_rotate (w[1], 7)) ^ (right_rotate (w[1], 18)) ^ (w[1] >> 3);
     s1_ext = (right_rotate (w[14], 17)) ^ (right_rotate (w[14], 19))  ^ (w[14] >> 10);
   end
 
-  always_comb begin : la_CompressComb
+  always @(*) begin : la_CompressComb
     s1_comp = right_rotate(e, 6) ^ right_rotate(e,11) ^ right_rotate(e, 25);
     ch = (e & f) ^ ((~e) & g);
     temp1 = h + s1_comp + ch + k + w[0];
@@ -121,18 +121,17 @@ module Sha256 (
     temp2 = s0_comp + maj;
   end
 
-  always_ff @(posedge clk) begin
-    int j;
+  always @(posedge clk) begin
     case (state)
       2'd0 : begin
         if (valid) begin
-          for (j = 0; j<16; j=j+1) begin
+          for (integer j = 0; j<16; j=j+1) begin
             w[j] <= chunk[j];
           end
         end
       end
       2'd1 : begin
-        for (j = 0; j<15; j=j+1) begin
+        for (integer j = 0; j<15; j=j+1) begin
           w[j] <= w[j+1];
         end
         w[15] <= w[0] + s0_ext + w[9] + s1_ext;
@@ -142,7 +141,7 @@ module Sha256 (
     endcase
   end
 
-  always_ff @(posedge clk) begin
+  always @(posedge clk) begin
       case (state)
         2'd0 : begin
           if (valid) begin
@@ -183,7 +182,7 @@ module Sha256 (
       endcase
     end
 
-  always_ff @(posedge clk or posedge arst) begin
+  always @(posedge clk or posedge arst) begin
     if (arst) begin
       hash[0] <= 32'h6a09e667;
       hash[1] <= 32'hbb67ae85;
@@ -236,7 +235,7 @@ module Sha256 (
     end
   end
 
-  always_ff @(posedge clk or posedge arst) begin
+  always @(posedge clk or posedge arst) begin
     if (arst) begin
       state <= 2'd0;
       ready <= 1'b1;
