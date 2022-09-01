@@ -50,11 +50,11 @@ module Sha256Ppl (
 
 );
 
-  wire [31:0] chunk [16];
-  reg  [31:0] hash [8];
-  reg  [31:0] w [65][16];
-  wire [31:0] k [64];
-  reg  [31:0] a[65], b[65], c[65], d[65], e[65], f[65], g[65], h[65];
+  wire [31:0] chunk [0:15];
+  reg  [31:0] hash [0:7];
+  reg  [31:0] w [0:64][0:15];
+  wire [31:0] k [0:63];
+  reg  [31:0] a[0:64], b[0:64], c[0:64], d[0:64], e[0:64], f[0:64], g[0:64], h[0:64];
   reg [64:0] valid;
 
   // Since verilog does not support multi-dim arrays in port list..
@@ -183,17 +183,17 @@ module Sha256Ppl (
   // Stage 1-63.
   genvar gv;
   generate for (gv=1; gv<65; gv=gv+1) begin : gen_stage
-    reg [31:0] s0_ext, s1_ext, s0_comp, s1_comp;
-    reg [31:0] ch;
-    reg [31:0] maj;
-    reg [31:0] temp1, temp2;
+    wire [31:0] s0_ext, s1_ext, s0_comp, s1_comp;
+    wire [31:0] ch;
+    wire [31:0] maj;
+    wire [31:0] temp1, temp2;
 
-    always_comb begin : la_ExtendComb
-      s0_ext = (right_rotate (w[gv-1][1], 7)) ^ (right_rotate (w[gv-1][1], 18)) ^ (w[gv-1][1] >> 3);
-      s1_ext = (right_rotate (w[gv-1][14], 17)) ^ (right_rotate (w[gv-1][14], 19))  ^ (w[gv-1][14] >> 10);
-    end
 
-    always_ff @(posedge clk) begin : la_ExtendFF
+    assign s0_ext = (right_rotate (w[gv-1][1], 7)) ^ (right_rotate (w[gv-1][1], 18)) ^ (w[gv-1][1] >> 3);
+    assign s1_ext = (right_rotate (w[gv-1][14], 17)) ^ (right_rotate (w[gv-1][14], 19))  ^ (w[gv-1][14] >> 10);
+
+
+    always @(posedge clk) begin : la_ExtendFF
       if (valid[gv-1]) begin
         for (integer j = 0; j<15; j=j+1) begin
           w[gv][j] <= w[gv-1][j+1];
@@ -202,16 +202,15 @@ module Sha256Ppl (
       end
     end
 
-    always_comb begin : la_CompressComb
-      s1_comp = right_rotate(e[gv-1], 6) ^ right_rotate(e[gv-1],11) ^ right_rotate(e[gv-1], 25);
-      ch = (e[gv-1] & f[gv-1]) ^ ((~e[gv-1]) & g[gv-1]);
-      temp1 = h[gv-1] + s1_comp + ch + k[gv-1] + w[gv-1][0];
-      s0_comp = right_rotate(a[gv-1], 2) ^ right_rotate(a[gv-1], 13) ^ right_rotate(a[gv-1], 22);
-      maj = (a[gv-1] & b[gv-1]) ^ (a[gv-1] & c[gv-1]) ^ (b[gv-1] & c[gv-1]);
-      temp2 = s0_comp + maj;
-    end
 
-    always_ff @(posedge clk) begin : la_CompressFF
+    assign s1_comp = right_rotate(e[gv-1], 6) ^ right_rotate(e[gv-1],11) ^ right_rotate(e[gv-1], 25);
+    assign ch = (e[gv-1] & f[gv-1]) ^ ((~e[gv-1]) & g[gv-1]);
+    assign temp1 = h[gv-1] + s1_comp + ch + k[gv-1] + w[gv-1][0];
+    assign s0_comp = right_rotate(a[gv-1], 2) ^ right_rotate(a[gv-1], 13) ^ right_rotate(a[gv-1], 22);
+    assign maj = (a[gv-1] & b[gv-1]) ^ (a[gv-1] & c[gv-1]) ^ (b[gv-1] & c[gv-1]);
+    assign temp2 = s0_comp + maj;
+
+    always @(posedge clk) begin : la_CompressFF
       if (valid[gv-1]) begin
         h[gv] <= g[gv-1];
         g[gv] <= f[gv-1];
@@ -233,7 +232,7 @@ module Sha256Ppl (
     end
   end
 
-  end : gen_stage
+  end
   endgenerate
 
   always @(posedge clk) begin
