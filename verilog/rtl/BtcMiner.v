@@ -20,7 +20,7 @@ module BtcMiner (
     output            wb_rty
 );
 
-  localparam NUM_CORES = 8;
+  localparam NUM_CORES = 1;
   localparam CORE_SEARCH_SPACE = 2**(32-$clog2(NUM_CORES));
 
   wire [31:0] version;
