@@ -252,15 +252,11 @@ module BtcMinerCore #(
   end
 
   // Sha256 Core 0
-  Sha256 u0_Sha256 (
+  Sha256Ppl u0_Sha256 (
   .clk   (clk),
   .arst  (arst),
-  .rst   (core_0_rst),
-  .load_init (core_0_load_init),
-  .valid (core_0_valid),
-  .ready (core_0_ready),
-  .round (round),
-  .k (k),
+  .valid_i (core_0_valid),
+  .valid_o (core_0_ready),
 
   .init_0 (core_0_init_0),
   .init_1 (core_0_init_1),
@@ -299,15 +295,11 @@ module BtcMinerCore #(
   );
 
   // Sha256 Core 1
-  Sha256 u1_Sha256 (
+  Sha256Ppl u1_Sha256 (
   .clk   (clk),
   .arst  (arst),
-  .rst   (core_1_rst),
-  .load_init (core_1_load_init),
-  .valid (core_1_valid),
-  .ready (core_1_ready),
-  .round (),
-  .k (k),
+  .valid_i (core_1_valid),
+  .valid_o (core_1_ready),
 
   .init_0 (32'h6a09e667),
   .init_1 (32'hbb67ae85),
@@ -345,11 +337,4 @@ module BtcMinerCore #(
   .hash_7 (core_1_hash_7)
   );
 
-  // Shared key memory
-  Sha256KeyMem u_KeyMem (
-  .clk       (clk),
-  .rst       (rst),
-  .k_addr    (round),
-  .k         (k)
-  );
 endmodule
