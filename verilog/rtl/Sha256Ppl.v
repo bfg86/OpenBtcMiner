@@ -10,6 +10,7 @@
 module Sha256Ppl (
   input wire clk,
   input wire arst,
+  input wire rst,
   input wire valid_i,
   output reg valid_o,
 
@@ -175,6 +176,9 @@ module Sha256Ppl (
     if (arst) begin
       valid[0] <= 1'b0;
     end
+    else if (rst) begin
+      valid[0] <= 1'b0;
+    end
     else begin
       valid[0] <= valid_i;
     end
@@ -227,6 +231,9 @@ module Sha256Ppl (
     if (arst) begin
       valid[gv] <= 1'b0;
     end
+    else if (rst) begin
+      valid[gv] <= 1'b0;
+    end
     else begin
       valid[gv] <= valid[gv-1];
     end
@@ -250,6 +257,9 @@ module Sha256Ppl (
 
   always @(posedge clk or posedge arst) begin
     if (arst) begin
+      valid_o <= 1'b0;
+    end
+    else if (rst) begin
       valid_o <= 1'b0;
     end
     else begin
