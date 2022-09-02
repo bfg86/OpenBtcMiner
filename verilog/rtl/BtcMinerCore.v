@@ -231,6 +231,7 @@ module BtcMinerCore #(
   Sha256Ppl u0_Sha256 (
   .clk   (clk),
   .arst  (arst),
+  .rst   (nonce_found),
   .valid_i (core_0_valid_i),
   .valid_o (core_0_valid_o),
 
@@ -274,6 +275,7 @@ module BtcMinerCore #(
   Sha256Ppl u1_Sha256 (
   .clk   (clk),
   .arst  (arst),
+  .rst   (nonce_found),
   .valid_i (core_1_valid_i),
   .valid_o (core_1_valid_o),
 
