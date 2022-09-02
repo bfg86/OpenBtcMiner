@@ -28,7 +28,7 @@ module BtcMinerCore #(
   input wire [31:0] bits,
   input wire [31:0] nonce_in,
   output reg        done,
-  output reg        nonce_found,
+  output reg        nonce_found_flag,
   output wire [31:0] nonce_out
 );
   reg         start_d;
@@ -106,6 +106,7 @@ module BtcMinerCore #(
   reg  [31:0] nonce;
   wire [31:0] next_nonce;
 
+  reg  nonce_found;
   wire timeout;
 
   // States
@@ -172,17 +173,15 @@ module BtcMinerCore #(
     else start_d <= start;
   end
 
-  // Next nonce
-  assign next_nonce = nonce + 1'd1;
-
-  // Nonce output is from the previous round
-  assign nonce_out = nonce - 1;
+  assign nonce_out = nonce;
 
   // State machine
   always @(posedge clk or posedge arst) begin
     if (arst) begin
       state <= 2'd0;
       done <= 1'b1;
+      nonce_found_flag <= 1'b0;
+      nonce <= 32'd0;
     end
     else begin
       case (state)
@@ -191,6 +190,7 @@ module BtcMinerCore #(
           state <= 2'd1;
           done <= 1'b0;
           nonce <= config_use_nonce_in ? nonce_in : NONCE_INIT;
+          nonce_found_flag <= 1'b0;
           core_0_init_0 <= 32'h6a09e667;
           core_0_init_1 <= 32'hbb67ae85;
           core_0_init_2 <= 32'h3c6ef372;
@@ -215,10 +215,12 @@ module BtcMinerCore #(
         end
       end
       2'd2: begin // HASH
-        nonce <= next_nonce;
+        nonce <= nonce + 1'b1;
         if (core_1_valid_o && (nonce_found || timeout || config_oneshot)) begin
           state <= 2'd0;
           done <= 1'b1;
+          nonce <= nonce - 132; // It takes 132 cycles to propagate a nonce to its hash.
+          nonce_found_flag <= nonce_found;
         end
       end
       default: begin

@@ -2,7 +2,7 @@ module BtcMiner (
 `ifdef USE_POWER_PINS
     inout vccd1,	// User area 1 1.8V supply
     inout vssd1,	// User area 1 digital ground
-`endif  
+`endif
     input             clk,
     input             arst,
     input             wb_rst,
@@ -116,7 +116,7 @@ module BtcMiner (
     .nonce_in       (nonce_in),
     .nonce_out      (nonce),
     .done           (done),
-    .nonce_found    (nonce_found),
+    .nonce_found_flag (nonce_found),
     .start          (start),
     .config_use_nonce_in (config_use_nonce_in),
     .config_oneshot (config_oneshot)
