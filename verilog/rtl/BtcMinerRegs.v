@@ -20,7 +20,8 @@ module BtcMinerRegs #(
     parameter ID_TIME        = 8'h48,
     parameter ID_BITS        = 8'h4C,
     parameter ID_NONCE       = 8'h50,
-    parameter ID_STATUS      = 8'h54
+    parameter ID_STATUS      = 8'h54,
+    parameter ID_NONCE_OUT   = 8'h58
 ) (
     // Clock / reset
     input wire clk,
@@ -120,8 +121,9 @@ module BtcMinerRegs #(
           ID_MERKLE_7:    wbRData <= merkle_root_7;
           ID_TIME:        wbRData <= btime;
           ID_BITS:        wbRData <= bits;
-          ID_NONCE:       wbRData <= nonce;
+          ID_NONCE:       wbRData <= nonce_in;
           ID_STATUS:      wbRData <= {30'd0, nonce_found, done};
+          ID_NONCE_OUT:   wbRData <= nonce;
           default: begin
           end
         endcase
