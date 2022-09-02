@@ -46,6 +46,7 @@
 #define reg_btc_bits        (*(volatile uint32_t*) (0x3000004C))
 #define reg_btc_nonce       (*(volatile uint32_t*) (0x30000050))
 #define reg_btc_status      (*(volatile uint32_t*) (0x30000054))
+#define reg_btc_nonce_out   (*(volatile uint32_t*) (0x30000058))
 
 void main()
 {
@@ -108,7 +109,7 @@ void main()
     reg_btc_merkle_4    = 0x710E951E;
     reg_btc_merkle_5    = 0xD797F7AF;
     reg_btc_merkle_6    = 0xFC8892B0;
-    reg_btc_merkle_7    = 0xF1FC122B;    
+    reg_btc_merkle_7    = 0xF1FC122B;
     reg_btc_time        = 0xC7F5D74D;
     reg_btc_bits        = 0xF2B9441A;
 
@@ -116,13 +117,17 @@ void main()
     reg_btc_nonce = 0x42a14693;
 
     // Start hashing
-    reg_btc_status = 1;    
+    reg_btc_status = 1;
 
     // Wait for done flag
     while (reg_btc_status == 0);
 
-    // Check nonce value and signal test end
-    if (reg_btc_nonce == 0x42a14695) {
-        reg_mprj_datal = 0xAB610000;
-    }
+    int status = 0xAB61;
+    // Check nonce found
+    if ((reg_btc_status & 0x2) != 2) status++;
+    // Check nonce value
+    if (reg_btc_nonce_out != 0x42a14695) status++;
+
+    // Return status to testbench. Success = 0xAB610000;
+    reg_mprj_datal = (status << 16);
 }

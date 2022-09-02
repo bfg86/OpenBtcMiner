@@ -136,7 +136,7 @@ module btcminer_tb;
 			$sdf_annotate("../../../caravel/sdf/gpio_defaults_block.sdf", uut.gpio_defaults_block_36) ;
 			$sdf_annotate("../../../caravel/sdf/gpio_defaults_block.sdf", uut.gpio_defaults_block_37) ;
 		end
-	`endif 
+	`endif
 
 	initial begin
 		$dumpfile("btcminer.vcd");
@@ -149,24 +149,38 @@ module btcminer_tb;
 		end
 		$display("%c[1;31m",27);
 		`ifdef GL
-			$display ("Monitor: Timeout, Test Mega-Project WB Port (GL) Failed");
+			$display ("Monitor: Test BtcMiner (GL) timeout");
 		`else
-			$display ("Monitor: Timeout, Test Mega-Project WB Port (RTL) Failed");
+			$display ("Monitor: Test BtcMiner (RTL) timeout");
 		`endif
 		$display("%c[0m",27);
 		$finish;
 	end
 
 	initial begin
-	   wait(checkbits == 16'hAB60);
-		$display("Monitor: MPRJ-Logic WB Started");
-		wait(checkbits == 16'hAB61);
+		wait(checkbits == 16'hAB60);
+		$display("Monitor: MPRJ-BtcMiner Started");
+		wait(checkbits != 16'hAB60);
+		if (checkbits == 16'hAB61) begin
+		$display("%c[1;32m",27);
 		`ifdef GL
-	    	$display("Monitor: Mega-Project WB (GL) Passed");
+	    	$display("Monitor: Mega-Project BtcMiner (GL) Passed");
 		`else
-		    $display("Monitor: Mega-Project WB (RTL) Passed");
+		    $display("Monitor: Mega-Project BtcMiner (RTL) Passed");
 		`endif
-	    $finish;
+		$display("%c[0m",27);
+		$finish;
+		end
+		else begin
+		$display("%c[1;31m",27);
+		`ifdef GL
+	    	$display("Monitor: Mega-Project BtcMiner (GL) Failed. Code: 0x%h", checkbits);
+		`else
+		    $display("Monitor: Mega-Project BtcMiner (RTL) Failed. Code: 0x%h", checkbits);
+		`endif
+		$display("%c[0m",27);
+		$finish;
+		end
 	end
 
 	initial begin
