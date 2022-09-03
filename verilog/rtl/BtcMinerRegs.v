@@ -64,9 +64,9 @@ module BtcMinerRegs #(
     output reg [31:0] nonce_in,
 
     // Miner results
-    input wire [31:0] nonce,
-    input wire        done,
-    input wire        nonce_found,
+    input wire [31:0] nonce_a,
+    input wire        done_a,
+    input wire        nonce_found_a,
 
     // Miner control
     output reg start,
@@ -78,12 +78,40 @@ module BtcMinerRegs #(
   wire wbRead;
   wire wbWrite;
 
+  reg [31:0] nonce;
+  reg        done;
+  reg        nonce_found;
+  reg        transfer_x, transfer, transfer_d;
+
   assign wbAccess = wbCycle & wbStrobe;
   assign wbRead = wbAccess & (~wbWe) & (wbAck == 1'b0);
   assign wbWrite = wbAccess & wbWe & (wbAck == 1'b0);
 
   assign wbErr = 1'b0;
   assign wbRty = 1'b0;
+
+  // Synchronize miner results. Delay to do edge detection
+  always @(posedge clk) begin
+    if (wbRst) begin
+      transfer_x <= 1'b0;
+      transfer   <= 1'b0;
+      transfer_d <= 1'b0;
+    end
+    else begin
+      transfer_x <= done_a;
+      transfer   <= transfer_x;
+      transfer_d <= transfer;
+    end
+  end
+  
+  // Use any edge on "done" to transfer
+  always @(posedge clk) begin
+    if (transfer ^ transfer_d) begin
+      done        <= done_a;
+      nonce       <= nonce_a;
+      nonce_found <= nonce_found_a;
+    end
+  end
 
   // Wishbone ack
   always @(posedge clk) begin
@@ -287,13 +315,12 @@ module BtcMinerRegs #(
             if (wbSel[3]) nonce_in[31:24] <= wbWData[31:24];
           end
           ID_STATUS: begin
-            start <= 1'b1;
+            start <= ~start;
           end
           default: begin
           end
         endcase
       end
-      if (start) start <= 1'b0;
     end
   end
 endmodule

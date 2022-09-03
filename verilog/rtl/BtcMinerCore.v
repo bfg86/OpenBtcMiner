@@ -4,33 +4,61 @@ module BtcMinerCore #(
   )(
   input wire        clk,
   input wire        arst,
-  input wire        start,
-  input wire        config_use_nonce_in,
-  input wire        config_oneshot,
-  input wire [31:0] version,
-  input wire [31:0] previous_hash_0,
-  input wire [31:0] previous_hash_1,
-  input wire [31:0] previous_hash_2,
-  input wire [31:0] previous_hash_3,
-  input wire [31:0] previous_hash_4,
-  input wire [31:0] previous_hash_5,
-  input wire [31:0] previous_hash_6,
-  input wire [31:0] previous_hash_7,
-  input wire [31:0] merkle_root_0,
-  input wire [31:0] merkle_root_1,
-  input wire [31:0] merkle_root_2,
-  input wire [31:0] merkle_root_3,
-  input wire [31:0] merkle_root_4,
-  input wire [31:0] merkle_root_5,
-  input wire [31:0] merkle_root_6,
-  input wire [31:0] merkle_root_7,
-  input wire [31:0] btime,
-  input wire [31:0] bits,
-  input wire [31:0] nonce_in,
+  input wire        start_a,
+  input wire        config_use_nonce_in_a,
+  input wire        config_oneshot_a,
+  input wire [31:0] version_a,
+  input wire [31:0] previous_hash_a_0,
+  input wire [31:0] previous_hash_a_1,
+  input wire [31:0] previous_hash_a_2,
+  input wire [31:0] previous_hash_a_3,
+  input wire [31:0] previous_hash_a_4,
+  input wire [31:0] previous_hash_a_5,
+  input wire [31:0] previous_hash_a_6,
+  input wire [31:0] previous_hash_a_7,
+  input wire [31:0] merkle_root_a_0,
+  input wire [31:0] merkle_root_a_1,
+  input wire [31:0] merkle_root_a_2,
+  input wire [31:0] merkle_root_a_3,
+  input wire [31:0] merkle_root_a_4,
+  input wire [31:0] merkle_root_a_5,
+  input wire [31:0] merkle_root_a_6,
+  input wire [31:0] merkle_root_a_7,
+  input wire [31:0] btime_a,
+  input wire [31:0] bits_a,
+  input wire [31:0] nonce_in_a,
   output reg        done,
   output reg        nonce_found_flag,
   output wire [31:0] nonce_out
 );
+
+  reg        start;
+  reg        config_use_nonce_in;
+  reg        config_oneshot;
+  reg [31:0] version;
+  reg [31:0] previous_hash_0;
+  reg [31:0] previous_hash_1;
+  reg [31:0] previous_hash_2;
+  reg [31:0] previous_hash_3;
+  reg [31:0] previous_hash_4;
+  reg [31:0] previous_hash_5;
+  reg [31:0] previous_hash_6;
+  reg [31:0] previous_hash_7;
+  reg [31:0] merkle_root_0;
+  reg [31:0] merkle_root_1;
+  reg [31:0] merkle_root_2;
+  reg [31:0] merkle_root_3;
+  reg [31:0] merkle_root_4;
+  reg [31:0] merkle_root_5;
+  reg [31:0] merkle_root_6;
+  reg [31:0] merkle_root_7;
+  reg [31:0] btime;
+  reg [31:0] bits;
+  reg [31:0] nonce_in;
+  reg        transfer_x;
+  reg        transfer;
+  reg        transfer_d;
+
   reg         start_d;
   reg         core_0_valid_i;
   wire        core_0_valid_o;
@@ -116,6 +144,55 @@ module BtcMinerCore #(
   // HASH    - core 0 re-calculates second chunk with incremental nonce. Core 1 hashes previous result from Core 0
   reg [1:0] state;
 
+  // Synchronize configuration data. 
+  always @(posedge clk or posedge arst) begin
+    if (arst) begin
+      transfer_x <= 1'b0;
+      transfer   <= 1'b0;
+      transfer_d <= 1'b0;
+    end
+    else begin
+      transfer_x <= start_a;
+      transfer   <= transfer_x;
+      transfer_d <= transfer;
+    end
+  end
+
+  // Use any toggle of "start" to do the transfer
+  always @(posedge clk or posedge arst) begin
+    if (arst) begin
+      start <= 1'b0;
+    end
+    else begin
+      if (transfer ^ transfer_d) begin
+        start <= 1'b1;
+        config_use_nonce_in <= config_use_nonce_in_a;
+        config_oneshot <= config_oneshot_a;
+        version <= version_a;
+        previous_hash_0 <= previous_hash_a_0;
+        previous_hash_1 <= previous_hash_a_1;
+        previous_hash_2 <= previous_hash_a_2;
+        previous_hash_3 <= previous_hash_a_3;
+        previous_hash_4 <= previous_hash_a_4;
+        previous_hash_5 <= previous_hash_a_5;
+        previous_hash_6 <= previous_hash_a_6;
+        previous_hash_7 <= previous_hash_a_7;
+        merkle_root_0 <= merkle_root_a_0;
+        merkle_root_1 <= merkle_root_a_1;
+        merkle_root_2 <= merkle_root_a_2;
+        merkle_root_3 <= merkle_root_a_3;
+        merkle_root_4 <= merkle_root_a_4;
+        merkle_root_5 <= merkle_root_a_5;
+        merkle_root_6 <= merkle_root_a_6;
+        merkle_root_7 <= merkle_root_a_7;
+        btime <= btime_a;
+        bits <= bits_a;
+        nonce_in <= nonce_in_a;
+      end
+      if (start) start <= 1'b0;
+    end
+  end
+      
   // Core 0 chunk inputs
   always @(*) begin
     if (start_d) begin
