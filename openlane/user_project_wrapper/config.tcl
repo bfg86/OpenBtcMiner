@@ -41,9 +41,10 @@ set ::env(VERILOG_FILES) "\
 	$script_dir/../../verilog/rtl/BtcMinerCore.v \
 	$script_dir/../../verilog/rtl/Sha256Ppl.v"
 
-## Clock configurations
+## Clock configurations. Note: custom SDC file
 set ::env(CLOCK_PORT) "wb_clk_i"
-set ::env(CLOCK_PERIOD) "10"
+set ::env(CLOCK_PERIOD) 10
+set ::env(BASE_SDC_FILE) "$::env(DESIGN_DIR)/constraints.sdc"
 
 ## Synthesis
 ## Floorplan
