@@ -4,7 +4,6 @@ module BtcMiner (
     inout vssd1,	// User area 1 digital ground
 `endif
     input             clk,
-    input             arst,
     input             wb_clk,
     input             wb_rst,
     input      [ 7:0] wb_addr,
@@ -46,6 +45,7 @@ module BtcMiner (
   wire        start;
   wire        done;
   wire        nonce_found;
+  wire        config_enable;
   wire        config_use_nonce_in;
   wire        config_oneshot;
 
@@ -88,13 +88,14 @@ module BtcMiner (
     .done_a         (done),
     .nonce_found_a  (nonce_found),
     .start          (start),
+    .config_enable  (config_enable),
     .config_use_nonce_in (config_use_nonce_in),
     .config_oneshot (config_oneshot)
   );
 
   BtcMinerCore u_Core (
     .clk            (clk),
-    .arst           (arst),
+    .arst_n_a         (config_enable),
     .version_a        (version),
     .previous_hash_a_0(previous_hash_0),
     .previous_hash_a_1(previous_hash_1),

@@ -3,7 +3,7 @@ module BtcMinerCore #(
   parameter NONCE_MAX  = 32'hFFFF_FFFF
   )(
   input wire        clk,
-  input wire        arst,
+  input wire        arst_n_a,
   input wire        start_a,
   input wire        config_use_nonce_in_a,
   input wire        config_oneshot_a,
@@ -32,6 +32,8 @@ module BtcMinerCore #(
   output wire [31:0] nonce_out
 );
 
+  reg        arst_x;
+  reg        arst;
   reg        start;
   reg        config_use_nonce_in;
   reg        config_oneshot;
@@ -143,6 +145,18 @@ module BtcMinerCore #(
   // CHUNK_1 - core 0 calculates the second chunk with initial nonce
   // HASH    - core 0 re-calculates second chunk with incremental nonce. Core 1 hashes previous result from Core 0
   reg [1:0] state;
+
+  // Synchronize reset release
+  always @(posedge clk or negedge arst_n_a) begin
+    if (!arst_n_a) begin
+      arst_x <= 1'b1;
+      arst   <= 1'b1;
+    end
+    else begin
+      arst_x <= 1'b0;
+      arst   <= arst_x;
+    end
+  end
 
   // Synchronize configuration data. 
   always @(posedge clk or posedge arst) begin

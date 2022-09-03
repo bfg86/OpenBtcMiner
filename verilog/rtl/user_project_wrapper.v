@@ -90,7 +90,6 @@ BtcMiner u_Miner (
 
     .clk    (user_clock2),
     .wb_clk (wb_clk_i),
-    .arst   (wb_rst_i),
     .wb_rst (wb_rst_i),
 
     // MGMT SoC Wishbone Slave

@@ -89,8 +89,8 @@ void main()
     // Flag start of the test
 	reg_mprj_datal = 0xAB600000;
 
-    // Configure BtcMiner to use the initial nonce
-    reg_btc_config = 1;
+    // Configure BtcMiner to use the initial nonce (and enable the core)
+    reg_btc_config = 3;
 
     // This is the header for block height 125552
     reg_btc_version     = 0x01000000;

@@ -70,6 +70,7 @@ module BtcMinerRegs #(
 
     // Miner control
     output reg start,
+    output reg config_enable,
     output reg config_use_nonce_in,
     output reg config_oneshot
 );
@@ -129,7 +130,7 @@ module BtcMinerRegs #(
     end else begin
       if (wbRead) begin
         case (wbAddr)
-          ID_CONFIG:      wbRData <= {30'd0, config_oneshot, config_use_nonce_in};
+          ID_CONFIG:      wbRData <= {29'd0, config_oneshot, config_use_nonce_in, config_enable};
           ID_VERSION:     wbRData <= version;
           ID_PREV_HASH_0: wbRData <= previous_hash_0;
           ID_PREV_HASH_1: wbRData <= previous_hash_1;
@@ -162,6 +163,7 @@ module BtcMinerRegs #(
   // Wishbone write
   always @(posedge clk) begin
     if (wbRst) begin
+      config_enable <= 1'b0;
       config_use_nonce_in <= 1'b0;
       config_oneshot <= 1'b0;
       version <= 32'd0;
@@ -190,8 +192,9 @@ module BtcMinerRegs #(
         case (wbAddr)
           ID_CONFIG: begin
             if (wbSel[0]) begin
-              config_use_nonce_in <= wbWData[0];
-              config_oneshot <= wbWData[1];
+              config_enable <= wbWData[0];
+              config_use_nonce_in <= wbWData[1];
+              config_oneshot <= wbWData[2];
             end
           end
           ID_VERSION: begin
