@@ -60,8 +60,8 @@ set ::env(DESIGN_IS_CORE) 1
 
 ## Placement
 set ::env(PL_BASIC_PLACEMENT) 0
-set ::env(PL_TARGET_DENSITY) 0.65
-set ::env(CELL_PAD) 1
+set ::env(PL_TARGET_DENSITY) 0.55
+set ::env(CELL_PAD) 3
 
 
 ## Routing
