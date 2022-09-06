@@ -26,8 +26,18 @@ openlane_cmd = \
 	-design $$(realpath ./$*) \
 	-save_path $$(realpath ..) \
 	-save \
-	-tag $(OPENLANE_RUN_TAG) \
-	-overwrite"
+	-tag $(OPENLANE_RUN_TAG)
+ifdef FROM
+	openlane_cmd += -from $(FROM)
+endif
+ifdef TO
+	openlane_cmd += -to $(TO)
+endif
+ifdef OWR
+	openlane_cmd += -overwrite
+endif
+openlane_cmd += "
+
 openlane_cmd_interactive = "flow.tcl -it -file $$(realpath ./$*/interactive.tcl)"
 
 docker_mounts = \
