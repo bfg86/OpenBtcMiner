@@ -68,5 +68,5 @@ set ::env(CELL_PAD) 4
 set ::env(ROUTING_CORES) 8
 
 ##
-set ::env(DIODE_INSERTION_STRATEGY) 4
+set ::env(DIODE_INSERTION_STRATEGY) 3
 
