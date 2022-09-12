@@ -60,7 +60,7 @@ set ::env(DESIGN_IS_CORE) 1
 
 ## Placement
 set ::env(PL_BASIC_PLACEMENT) 0
-set ::env(PL_TARGET_DENSITY) 0.55
+set ::env(PL_TARGET_DENSITY) 0.50
 set ::env(CELL_PAD) 4
 
 
@@ -68,5 +68,5 @@ set ::env(CELL_PAD) 4
 set ::env(ROUTING_CORES) 8
 
 ##
-set ::env(DIODE_INSERTION_STRATEGY) 3
+set ::env(DIODE_INSERTION_STRATEGY) 4
 
