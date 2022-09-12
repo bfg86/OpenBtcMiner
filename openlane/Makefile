@@ -16,7 +16,9 @@
 MAKEFLAGS+=--warn-undefined-variables
 
 export OPENLANE_RUN_TAG ?= $(shell date '+%y_%m_%d_%H_%M')
-OPENLANE_TAG ?= 2021.11.23_01.42.34
+export CARAVEL_ROOT?=$(PWD)/../caravel
+
+OPENLANE_TAG ?= 2022.07.02_01.38.08
 OPENLANE_IMAGE_NAME ?= efabless/openlane:$(OPENLANE_TAG)
 designs = $(shell find * -maxdepth 0 -type d)
 current_design = null
@@ -39,6 +41,15 @@ endif
 openlane_cmd += "
 
 openlane_cmd_interactive = "flow.tcl -it -file $$(realpath ./$*/interactive.tcl)"
+
+openlane_cmd_explore = \
+		       "flow.tcl \
+	               -design $$(realpath ./user_project_wrapper) \
+		       -threads 6 \
+		       -tag $(OPENLANE_RUN_TAG) \
+		       -synth_explore \
+		       "
+
 
 docker_mounts = \
 	-v $$(realpath $(PWD)/..):$$(realpath $(PWD)/..) \
@@ -86,6 +97,11 @@ endif
 	@cp ./$*/runs/$*/OPENLANE_VERSION ../signoff/$*/
 	@cp ./$*/runs/$*/PDK_SOURCES ../signoff/$*/
 	@cp ./$*/runs/$*/reports/*.csv ../signoff/$*/
+
+.PHONY: explore
+explore:
+	$(docker_run) \
+		$(OPENLANE_IMAGE_NAME) sh -c $(openlane_cmd_explore)
 
 .PHONY: mount
 mount:
