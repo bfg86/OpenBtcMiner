@@ -53,20 +53,21 @@ set ::env(SYNTH_MUX4_MAP) ""
 set ::env(SYNTH_MUX_MAP) ""
 set ::env(SYNTH_BUFFERING) 1
 set ::env(SYNTH_SIZING) 1
-
+set ::env(SYNTH_STRATEGY) {AREA 0}
 
 ## Floorplan
 set ::env(DESIGN_IS_CORE) 1
 
 ## Placement
 set ::env(PL_BASIC_PLACEMENT) 0
-set ::env(PL_TARGET_DENSITY) 0.50
+set ::env(PL_TARGET_DENSITY) 0.55
 set ::env(CELL_PAD) 4
 
 
 ## Routing
+set ::env(GLB_RT_MAX_DIODE_INS_ITERS) 5
 set ::env(ROUTING_CORES) 8
 
 ##
-set ::env(DIODE_INSERTION_STRATEGY) 4
+set ::env(DIODE_INSERTION_STRATEGY) 3
 
