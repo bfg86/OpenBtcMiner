@@ -2,9 +2,9 @@ module BtcMiner (
 `ifdef USE_POWER_PINS
     inout vccd1,	// User area 1 1.8V supply
     inout vssd1,	// User area 1 digital ground
-`endif  
+`endif
     input             clk,
-    input             arst,
+    input             wb_clk,
     input             wb_rst,
     input      [ 7:0] wb_addr,
     input      [ 3:0] wb_sel,
@@ -20,8 +20,6 @@ module BtcMiner (
     output            wb_rty
 );
 
-  localparam NUM_CORES = 8;
-  localparam CORE_SEARCH_SPACE = 2**(32-$clog2(NUM_CORES));
 
   wire [31:0] version;
   wire [31:0] previous_hash_0;
@@ -43,32 +41,16 @@ module BtcMiner (
   wire [31:0] btime;
   wire [31:0] bits;
   wire [31:0] nonce_in;
-  reg  [31:0] nonce;
+  wire  [31:0] nonce;
   wire        start;
   wire        done;
   wire        nonce_found;
-  wire [31:0] nonce_per_core [NUM_CORES-1:0];
-  wire [NUM_CORES-1:0]       done_per_core;
-  wire [NUM_CORES-1:0]       nonce_found_per_core;
+  wire        config_enable;
   wire        config_use_nonce_in;
   wire        config_oneshot;
 
-  // Combine done and nonce_found
-  assign done = &(done_per_core);
-  assign nonce_found = |(nonce_found_per_core);
-
-  // Set nonce to the (last) nonce found
-  always @(*) begin
-    nonce = 32'd0;
-    for (integer i=0; i<NUM_CORES; i=i+1) begin
-      if (nonce_found_per_core[i]) begin
-        nonce = nonce_per_core[i];
-      end
-    end
-  end
-
   BtcMinerRegs u_Regs (
-    .clk            (clk),
+    .clk            (wb_clk),
     .wbRst          (wb_rst),
     .wbAddr         (wb_addr),
     .wbSel          (wb_sel),
@@ -102,51 +84,45 @@ module BtcMiner (
     .btime          (btime),
     .bits           (bits),
     .nonce_in       (nonce_in),
-    .nonce          (nonce),
-    .done           (done),
-    .nonce_found    (nonce_found),
+    .nonce_a        (nonce),
+    .done_a         (done),
+    .nonce_found_a  (nonce_found),
     .start          (start),
+    .config_enable  (config_enable),
     .config_use_nonce_in (config_use_nonce_in),
     .config_oneshot (config_oneshot)
   );
 
-  genvar g;
-  generate for (g=0; g<NUM_CORES; g=g+1) begin : g_Core
-  BtcMinerCore #(
-    .NONCE_INIT (CORE_SEARCH_SPACE * g),
-    .NONCE_MAX  (CORE_SEARCH_SPACE * (g+1) -1)
-    ) u_Core (
+  BtcMinerCore u_Core (
     .clk            (clk),
-    .arst           (arst),
-    .version        (version),
-    .previous_hash_0(previous_hash_0),
-    .previous_hash_1(previous_hash_1),
-    .previous_hash_2(previous_hash_2),
-    .previous_hash_3(previous_hash_3),
-    .previous_hash_4(previous_hash_4),
-    .previous_hash_5(previous_hash_5),
-    .previous_hash_6(previous_hash_6),
-    .previous_hash_7(previous_hash_7),
-    .merkle_root_0  (merkle_root_0),
-    .merkle_root_1  (merkle_root_1),
-    .merkle_root_2  (merkle_root_2),
-    .merkle_root_3  (merkle_root_3),
-    .merkle_root_4  (merkle_root_4),
-    .merkle_root_5  (merkle_root_5),
-    .merkle_root_6  (merkle_root_6),
-    .merkle_root_7  (merkle_root_7),
-    .btime          (btime),
-    .bits           (bits),
-    .nonce_in       (nonce_in),
-    .nonce_out      (nonce_per_core[g]),
-    .done           (done_per_core[g]),
-    .nonce_found    (nonce_found_per_core[g]),
-    .start          (start),
-    .config_use_nonce_in (config_use_nonce_in),
-    .config_oneshot (config_oneshot)
+    .arst_n_a         (config_enable),
+    .version_a        (version),
+    .previous_hash_a_0(previous_hash_0),
+    .previous_hash_a_1(previous_hash_1),
+    .previous_hash_a_2(previous_hash_2),
+    .previous_hash_a_3(previous_hash_3),
+    .previous_hash_a_4(previous_hash_4),
+    .previous_hash_a_5(previous_hash_5),
+    .previous_hash_a_6(previous_hash_6),
+    .previous_hash_a_7(previous_hash_7),
+    .merkle_root_a_0  (merkle_root_0),
+    .merkle_root_a_1  (merkle_root_1),
+    .merkle_root_a_2  (merkle_root_2),
+    .merkle_root_a_3  (merkle_root_3),
+    .merkle_root_a_4  (merkle_root_4),
+    .merkle_root_a_5  (merkle_root_5),
+    .merkle_root_a_6  (merkle_root_6),
+    .merkle_root_a_7  (merkle_root_7),
+    .btime_a          (btime),
+    .bits_a           (bits),
+    .nonce_in_a       (nonce_in),
+    .nonce_out      (nonce),
+    .done           (done),
+    .nonce_found_flag (nonce_found),
+    .start_a          (start),
+    .config_use_nonce_in_a (config_use_nonce_in),
+    .config_oneshot_a (config_oneshot)
   );
-  end
-  endgenerate
 
 // Cocotb waveform dump
 `ifdef COCOTB_SIM

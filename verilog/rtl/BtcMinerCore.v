@@ -3,42 +3,67 @@ module BtcMinerCore #(
   parameter NONCE_MAX  = 32'hFFFF_FFFF
   )(
   input wire        clk,
-  input wire        arst,
-  input wire        start,
-  input wire        config_use_nonce_in,
-  input wire        config_oneshot,
-  input wire [31:0] version,
-  input wire [31:0] previous_hash_0,
-  input wire [31:0] previous_hash_1,
-  input wire [31:0] previous_hash_2,
-  input wire [31:0] previous_hash_3,
-  input wire [31:0] previous_hash_4,
-  input wire [31:0] previous_hash_5,
-  input wire [31:0] previous_hash_6,
-  input wire [31:0] previous_hash_7,
-  input wire [31:0] merkle_root_0,
-  input wire [31:0] merkle_root_1,
-  input wire [31:0] merkle_root_2,
-  input wire [31:0] merkle_root_3,
-  input wire [31:0] merkle_root_4,
-  input wire [31:0] merkle_root_5,
-  input wire [31:0] merkle_root_6,
-  input wire [31:0] merkle_root_7,
-  input wire [31:0] btime,
-  input wire [31:0] bits,
-  input wire [31:0] nonce_in,
+  input wire        arst_n_a,
+  input wire        start_a,
+  input wire        config_use_nonce_in_a,
+  input wire        config_oneshot_a,
+  input wire [31:0] version_a,
+  input wire [31:0] previous_hash_a_0,
+  input wire [31:0] previous_hash_a_1,
+  input wire [31:0] previous_hash_a_2,
+  input wire [31:0] previous_hash_a_3,
+  input wire [31:0] previous_hash_a_4,
+  input wire [31:0] previous_hash_a_5,
+  input wire [31:0] previous_hash_a_6,
+  input wire [31:0] previous_hash_a_7,
+  input wire [31:0] merkle_root_a_0,
+  input wire [31:0] merkle_root_a_1,
+  input wire [31:0] merkle_root_a_2,
+  input wire [31:0] merkle_root_a_3,
+  input wire [31:0] merkle_root_a_4,
+  input wire [31:0] merkle_root_a_5,
+  input wire [31:0] merkle_root_a_6,
+  input wire [31:0] merkle_root_a_7,
+  input wire [31:0] btime_a,
+  input wire [31:0] bits_a,
+  input wire [31:0] nonce_in_a,
   output reg        done,
-  output reg        nonce_found,
+  output reg        nonce_found_flag,
   output wire [31:0] nonce_out
 );
 
-  wire [5:0]  round;
-  wire [31:0] k;
+  reg        arst_x;
+  reg        arst;
+  reg        start;
+  reg        config_use_nonce_in;
+  reg        config_oneshot;
+  reg [31:0] version;
+  reg [31:0] previous_hash_0;
+  reg [31:0] previous_hash_1;
+  reg [31:0] previous_hash_2;
+  reg [31:0] previous_hash_3;
+  reg [31:0] previous_hash_4;
+  reg [31:0] previous_hash_5;
+  reg [31:0] previous_hash_6;
+  reg [31:0] previous_hash_7;
+  reg [31:0] merkle_root_0;
+  reg [31:0] merkle_root_1;
+  reg [31:0] merkle_root_2;
+  reg [31:0] merkle_root_3;
+  reg [31:0] merkle_root_4;
+  reg [31:0] merkle_root_5;
+  reg [31:0] merkle_root_6;
+  reg [31:0] merkle_root_7;
+  reg [31:0] btime;
+  reg [31:0] bits;
+  reg [31:0] nonce_in;
+  reg        transfer_x;
+  reg        transfer;
+  reg        transfer_d;
 
-  wire        core_0_rst;
-  reg         core_0_load_init;
-  reg         core_0_valid;
-  wire        core_0_ready;
+  reg         start_d;
+  reg         core_0_valid_i;
+  wire        core_0_valid_o;
   reg  [31:0] core_0_chunk_0;
   reg  [31:0] core_0_chunk_1;
   reg  [31:0] core_0_chunk_2;
@@ -55,22 +80,14 @@ module BtcMinerCore #(
   reg  [31:0] core_0_chunk_13;
   reg  [31:0] core_0_chunk_14;
   reg  [31:0] core_0_chunk_15;
-  wire [31:0] core_0_init_0;
-  wire [31:0] core_0_init_1;
-  wire [31:0] core_0_init_2;
-  wire [31:0] core_0_init_3;
-  wire [31:0] core_0_init_4;
-  wire [31:0] core_0_init_5;
-  wire [31:0] core_0_init_6;
-  wire [31:0] core_0_init_7;
-  reg  [31:0] core_0_init_0_rg;
-  reg  [31:0] core_0_init_1_rg;
-  reg  [31:0] core_0_init_2_rg;
-  reg  [31:0] core_0_init_3_rg;
-  reg  [31:0] core_0_init_4_rg;
-  reg  [31:0] core_0_init_5_rg;
-  reg  [31:0] core_0_init_6_rg;
-  reg  [31:0] core_0_init_7_rg;
+  reg  [31:0] core_0_init_0;
+  reg  [31:0] core_0_init_1;
+  reg  [31:0] core_0_init_2;
+  reg  [31:0] core_0_init_3;
+  reg  [31:0] core_0_init_4;
+  reg  [31:0] core_0_init_5;
+  reg  [31:0] core_0_init_6;
+  reg  [31:0] core_0_init_7;
   wire [31:0] core_0_hash_0;
   wire [31:0] core_0_hash_1;
   wire [31:0] core_0_hash_2;
@@ -80,10 +97,9 @@ module BtcMinerCore #(
   wire [31:0] core_0_hash_6;
   wire [31:0] core_0_hash_7;
 
-  wire        core_1_rst;
-  reg         core_1_load_init;
-  reg         core_1_valid;
-  wire        core_1_ready;
+
+  reg         core_1_valid_i;
+  wire        core_1_valid_o;
   wire [31:0] core_1_chunk_0;
   wire [31:0] core_1_chunk_1;
   wire [31:0] core_1_chunk_2;
@@ -120,6 +136,7 @@ module BtcMinerCore #(
   reg  [31:0] nonce;
   wire [31:0] next_nonce;
 
+  reg  nonce_found;
   wire timeout;
 
   // States
@@ -129,9 +146,70 @@ module BtcMinerCore #(
   // HASH    - core 0 re-calculates second chunk with incremental nonce. Core 1 hashes previous result from Core 0
   reg [1:0] state;
 
+  // Synchronize reset release
+  always @(posedge clk or negedge arst_n_a) begin
+    if (!arst_n_a) begin
+      arst_x <= 1'b1;
+      arst   <= 1'b1;
+    end
+    else begin
+      arst_x <= 1'b0;
+      arst   <= arst_x;
+    end
+  end
+
+  // Synchronize configuration data. 
+  always @(posedge clk or posedge arst) begin
+    if (arst) begin
+      transfer_x <= 1'b0;
+      transfer   <= 1'b0;
+      transfer_d <= 1'b0;
+    end
+    else begin
+      transfer_x <= start_a;
+      transfer   <= transfer_x;
+      transfer_d <= transfer;
+    end
+  end
+
+  // Use any toggle of "start" to do the transfer
+  always @(posedge clk or posedge arst) begin
+    if (arst) begin
+      start <= 1'b0;
+    end
+    else begin
+      if (transfer ^ transfer_d) begin
+        start <= 1'b1;
+        config_use_nonce_in <= config_use_nonce_in_a;
+        config_oneshot <= config_oneshot_a;
+        version <= version_a;
+        previous_hash_0 <= previous_hash_a_0;
+        previous_hash_1 <= previous_hash_a_1;
+        previous_hash_2 <= previous_hash_a_2;
+        previous_hash_3 <= previous_hash_a_3;
+        previous_hash_4 <= previous_hash_a_4;
+        previous_hash_5 <= previous_hash_a_5;
+        previous_hash_6 <= previous_hash_a_6;
+        previous_hash_7 <= previous_hash_a_7;
+        merkle_root_0 <= merkle_root_a_0;
+        merkle_root_1 <= merkle_root_a_1;
+        merkle_root_2 <= merkle_root_a_2;
+        merkle_root_3 <= merkle_root_a_3;
+        merkle_root_4 <= merkle_root_a_4;
+        merkle_root_5 <= merkle_root_a_5;
+        merkle_root_6 <= merkle_root_a_6;
+        merkle_root_7 <= merkle_root_a_7;
+        btime <= btime_a;
+        bits <= bits_a;
+        nonce_in <= nonce_in_a;
+      end
+      if (start) start <= 1'b0;
+    end
+  end
+      
   // Core 0 chunk inputs
   always @(*) begin
-    if (state == 2'd0) begin
+    if (start_d) begin
       core_0_chunk_0  = version;
       core_0_chunk_1  = previous_hash_0;
       core_0_chunk_2  = previous_hash_1;
@@ -153,7 +231,7 @@ module BtcMinerCore #(
       core_0_chunk_0  = merkle_root_7;
       core_0_chunk_1  = btime;
       core_0_chunk_2  = bits;
-      core_0_chunk_3  = next_nonce;
+      core_0_chunk_3  = nonce;
       core_0_chunk_4  = 32'h8000_0000;
       core_0_chunk_5  = 32'd0;
       core_0_chunk_6  = 32'd0;
@@ -170,42 +248,31 @@ module BtcMinerCore #(
   end
 
   // Timeout
-  assign timeout = !(nonce < NONCE_MAX);
+  assign timeout = (nonce == NONCE_MAX);
 
   // (very) Simplistic nonce found
-  always @(*) nonce_found = (core_1_hash_7 == 32'd0);
+  always @(*) nonce_found = core_1_valid_o && (core_1_hash_7 == 32'd0);
 
   // Core control signals
   always @(*) begin
-    core_0_valid = start || (state != 2'd0 && core_0_ready);
-    core_0_load_init = (state != 2'd0 && core_0_ready);
-    core_1_valid = (state == 2'd2 && core_0_ready) ||
-                   (state == 2'd3 && core_1_ready && !timeout && !nonce_found);
-    core_1_load_init = core_1_valid;
+    core_0_valid_i = start_d || (state == 2'd2);
+    core_1_valid_i = (state == 2'd2 && core_0_valid_o);
   end
 
-  // Initial values for core 0
-  assign core_0_init_0 = (state == 2'd1) ? core_0_hash_0 : core_0_init_0_rg;
-  assign core_0_init_1 = (state == 2'd1) ? core_0_hash_1 : core_0_init_1_rg;
-  assign core_0_init_2 = (state == 2'd1) ? core_0_hash_2 : core_0_init_2_rg;
-  assign core_0_init_3 = (state == 2'd1) ? core_0_hash_3 : core_0_init_3_rg;
-  assign core_0_init_4 = (state == 2'd1) ? core_0_hash_4 : core_0_init_4_rg;
-  assign core_0_init_5 = (state == 2'd1) ? core_0_hash_5 : core_0_init_5_rg;
-  assign core_0_init_6 = (state == 2'd1) ? core_0_hash_6 : core_0_init_6_rg;
-  assign core_0_init_7 = (state == 2'd1) ? core_0_hash_7 : core_0_init_7_rg;
+  always @(posedge clk or posedge arst) begin
+    if (arst) start_d <= 1'b0;
+    else start_d <= start;
+  end
 
-  // Next nonce
-  assign next_nonce = (state != 2'd3 && config_use_nonce_in) ? nonce_in : nonce + 1'd1;
-
-  // Nonce output is from the previous round
-  assign nonce_out = nonce - 1;
+  assign nonce_out = nonce;
 
   // State machine
   always @(posedge clk or posedge arst) begin
     if (arst) begin
-      nonce <= NONCE_INIT;
       state <= 2'd0;
       done <= 1'b1;
+      nonce_found_flag <= 1'b0;
+      nonce <= 32'd0;
     end
     else begin
       case (state)
@@ -213,36 +280,38 @@ module BtcMinerCore #(
         if (start) begin
           state <= 2'd1;
           done <= 1'b0;
+          nonce <= config_use_nonce_in ? nonce_in : NONCE_INIT;
+          nonce_found_flag <= 1'b0;
+          core_0_init_0 <= 32'h6a09e667;
+          core_0_init_1 <= 32'hbb67ae85;
+          core_0_init_2 <= 32'h3c6ef372;
+          core_0_init_3 <= 32'ha54ff53a;
+          core_0_init_4 <= 32'h510e527f;
+          core_0_init_5 <= 32'h9b05688c;
+          core_0_init_6 <= 32'h1f83d9ab;
+          core_0_init_7 <= 32'h5be0cd19;
         end
       end
       2'd1: begin // CHUNK_0
-        if (core_0_ready) begin
-          core_0_init_0_rg <= core_0_hash_0;
-          core_0_init_1_rg <= core_0_hash_1;
-          core_0_init_2_rg <= core_0_hash_2;
-          core_0_init_3_rg <= core_0_hash_3;
-          core_0_init_4_rg <= core_0_hash_4;
-          core_0_init_5_rg <= core_0_hash_5;
-          core_0_init_6_rg <= core_0_hash_6;
-          core_0_init_7_rg <= core_0_hash_7;
+        if (core_0_valid_o) begin
+          core_0_init_0 <= core_0_hash_0;
+          core_0_init_1 <= core_0_hash_1;
+          core_0_init_2 <= core_0_hash_2;
+          core_0_init_3 <= core_0_hash_3;
+          core_0_init_4 <= core_0_hash_4;
+          core_0_init_5 <= core_0_hash_5;
+          core_0_init_6 <= core_0_hash_6;
+          core_0_init_7 <= core_0_hash_7;
           state <= 2'd2;
         end
       end
-      2'd2: begin // CHUNK_1
-        if (core_0_ready) begin
-          nonce <= next_nonce;
-          state <= 2'd3;
-        end
-      end
-      2'd3: begin // HASH
-        if (core_1_ready) begin
-          if (nonce_found || timeout || config_oneshot) begin
-            state <= 2'd0;
-            done <= 1'b1;
-          end
-          else begin
-            nonce <= next_nonce;
-          end
+      2'd2: begin // HASH
+        nonce <= nonce + 1'b1;
+        if (core_1_valid_o && (nonce_found || timeout || config_oneshot)) begin
+          state <= 2'd0;
+          done <= 1'b1;
+          nonce <= nonce - 132; // It takes 132 cycles to propagate a nonce to its hash.
+          nonce_found_flag <= nonce_found;
         end
       end
       default: begin
@@ -252,15 +321,12 @@ module BtcMinerCore #(
   end
 
   // Sha256 Core 0
-  Sha256 u0_Sha256 (
+  Sha256Ppl u0_Sha256 (
   .clk   (clk),
   .arst  (arst),
-  .rst   (core_0_rst),
-  .load_init (core_0_load_init),
-  .valid (core_0_valid),
-  .ready (core_0_ready),
-  .round (round),
-  .k (k),
+  .rst   (nonce_found),
+  .valid_i (core_0_valid_i),
+  .valid_o (core_0_valid_o),
 
   .init_0 (core_0_init_0),
   .init_1 (core_0_init_1),
@@ -299,15 +365,12 @@ module BtcMinerCore #(
   );
 
   // Sha256 Core 1
-  Sha256 u1_Sha256 (
+  Sha256Ppl u1_Sha256 (
   .clk   (clk),
   .arst  (arst),
-  .rst   (core_1_rst),
-  .load_init (core_1_load_init),
-  .valid (core_1_valid),
-  .ready (core_1_ready),
-  .round (),
-  .k (k),
+  .rst   (nonce_found),
+  .valid_i (core_1_valid_i),
+  .valid_o (core_1_valid_o),
 
   .init_0 (32'h6a09e667),
   .init_1 (32'hbb67ae85),
@@ -345,11 +408,4 @@ module BtcMinerCore #(
   .hash_7 (core_1_hash_7)
   );
 
-  // Shared key memory
-  Sha256KeyMem u_KeyMem (
-  .clk       (clk),
-  .rst       (rst),
-  .k_addr    (round),
-  .k         (k)
-  );
 endmodule

@@ -20,7 +20,8 @@ module BtcMinerRegs #(
     parameter ID_TIME        = 8'h48,
     parameter ID_BITS        = 8'h4C,
     parameter ID_NONCE       = 8'h50,
-    parameter ID_STATUS      = 8'h54
+    parameter ID_STATUS      = 8'h54,
+    parameter ID_NONCE_OUT   = 8'h58
 ) (
     // Clock / reset
     input wire clk,
@@ -63,12 +64,13 @@ module BtcMinerRegs #(
     output reg [31:0] nonce_in,
 
     // Miner results
-    input wire [31:0] nonce,
-    input wire        done,
-    input wire        nonce_found,
+    input wire [31:0] nonce_a,
+    input wire        done_a,
+    input wire        nonce_found_a,
 
     // Miner control
     output reg start,
+    output reg config_enable,
     output reg config_use_nonce_in,
     output reg config_oneshot
 );
@@ -77,12 +79,40 @@ module BtcMinerRegs #(
   wire wbRead;
   wire wbWrite;
 
+  reg [31:0] nonce;
+  reg        done;
+  reg        nonce_found;
+  reg        transfer_x, transfer, transfer_d;
+
   assign wbAccess = wbCycle & wbStrobe;
   assign wbRead = wbAccess & (~wbWe) & (wbAck == 1'b0);
   assign wbWrite = wbAccess & wbWe & (wbAck == 1'b0);
 
   assign wbErr = 1'b0;
   assign wbRty = 1'b0;
+
+  // Synchronize miner results. Delay to do edge detection
+  always @(posedge clk) begin
+    if (wbRst) begin
+      transfer_x <= 1'b0;
+      transfer   <= 1'b0;
+      transfer_d <= 1'b0;
+    end
+    else begin
+      transfer_x <= done_a;
+      transfer   <= transfer_x;
+      transfer_d <= transfer;
+    end
+  end
+  
+  // Use any edge on "done" to transfer
+  always @(posedge clk) begin
+    if (transfer ^ transfer_d) begin
+      done        <= done_a;
+      nonce       <= nonce_a;
+      nonce_found <= nonce_found_a;
+    end
+  end
 
   // Wishbone ack
   always @(posedge clk) begin
@@ -100,7 +130,7 @@ module BtcMinerRegs #(
     end else begin
       if (wbRead) begin
         case (wbAddr)
-          ID_CONFIG:      wbRData <= {30'd0, config_oneshot, config_use_nonce_in};
+          ID_CONFIG:      wbRData <= {29'd0, config_oneshot, config_use_nonce_in, config_enable};
           ID_VERSION:     wbRData <= version;
           ID_PREV_HASH_0: wbRData <= previous_hash_0;
           ID_PREV_HASH_1: wbRData <= previous_hash_1;
@@ -120,8 +150,9 @@ module BtcMinerRegs #(
           ID_MERKLE_7:    wbRData <= merkle_root_7;
           ID_TIME:        wbRData <= btime;
           ID_BITS:        wbRData <= bits;
-          ID_NONCE:       wbRData <= nonce;
+          ID_NONCE:       wbRData <= nonce_in;
           ID_STATUS:      wbRData <= {30'd0, nonce_found, done};
+          ID_NONCE_OUT:   wbRData <= nonce;
           default: begin
           end
         endcase
@@ -132,6 +163,7 @@ module BtcMinerRegs #(
   // Wishbone write
   always @(posedge clk) begin
     if (wbRst) begin
+      config_enable <= 1'b0;
       config_use_nonce_in <= 1'b0;
       config_oneshot <= 1'b0;
       version <= 32'd0;
@@ -160,8 +192,9 @@ module BtcMinerRegs #(
         case (wbAddr)
           ID_CONFIG: begin
             if (wbSel[0]) begin
-              config_use_nonce_in <= wbWData[0];
-              config_oneshot <= wbWData[1];
+              config_enable <= wbWData[0];
+              config_use_nonce_in <= wbWData[1];
+              config_oneshot <= wbWData[2];
             end
           end
           ID_VERSION: begin
@@ -285,13 +318,12 @@ module BtcMinerRegs #(
             if (wbSel[3]) nonce_in[31:24] <= wbWData[31:24];
           end
           ID_STATUS: begin
-            start <= 1'b1;
+            start <= ~start;
           end
           default: begin
           end
         endcase
       end
-      if (start) start <= 1'b0;
     end
   end
 endmodule

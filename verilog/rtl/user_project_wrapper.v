@@ -88,8 +88,8 @@ BtcMiner u_Miner (
 	.vssd1(vssd1),	// User area 1 digital ground
 `endif
 
-    .clk    (wb_clk_i),
-    .arst   (wb_rst_i),
+    .clk    (user_clock2),
+    .wb_clk (wb_clk_i),
     .wb_rst (wb_rst_i),
 
     // MGMT SoC Wishbone Slave

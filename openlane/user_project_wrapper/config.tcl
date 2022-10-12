@@ -35,54 +35,39 @@ set ::env(DESIGN_NAME) user_project_wrapper
 ## Source Verilog Files
 set ::env(VERILOG_FILES) "\
 	$::env(CARAVEL_ROOT)/verilog/rtl/defines.v \
-	$script_dir/../../verilog/rtl/user_project_wrapper.v"
+	$script_dir/../../verilog/rtl/user_project_wrapper.v \
+	$script_dir/../../verilog/rtl/BtcMiner.v \
+	$script_dir/../../verilog/rtl/BtcMinerRegs.v \
+	$script_dir/../../verilog/rtl/BtcMinerCore.v \
+	$script_dir/../../verilog/rtl/Sha256Ppl.v"
 
-## Clock configurations
-set ::env(CLOCK_PORT) "user_clock2"
-set ::env(CLOCK_NET) "mprj.clk"
+## Clock configurations. Note: custom SDC file
+set ::env(CLOCK_PORT) "wb_clk_i"
+set ::env(CLOCK_PERIOD) 10
+set ::env(BASE_SDC_FILE) "$::env(DESIGN_DIR)/constraints.sdc"
 
-set ::env(CLOCK_PERIOD) "10"
+## Synthesis
+set ::env(SYNTH_MAX_FANOUT) 1000
+set ::env(SYNTH_ADDER_TYPE) "YOSYS"
+set ::env(SYNTH_MUX4_MAP) ""
+set ::env(SYNTH_MUX_MAP) ""
+set ::env(SYNTH_BUFFERING) 1
+set ::env(SYNTH_SIZING) 1
+set ::env(SYNTH_STRATEGY) {AREA 0}
 
-## Internal Macros
-### Macro PDN Connections
-set ::env(FP_PDN_MACRO_HOOKS) "\
-	mprj vccd1 vssd1 vccd1 vssd1"
+## Floorplan
+set ::env(DESIGN_IS_CORE) 1
 
-### Macro Placement
-set ::env(MACRO_PLACEMENT_CFG) $script_dir/macro.cfg
+## Placement
+set ::env(PL_BASIC_PLACEMENT) 0
+set ::env(PL_TARGET_DENSITY) 0.55
+set ::env(CELL_PAD) 4
 
-### Black-box verilog and views
-set ::env(VERILOG_FILES_BLACKBOX) "\
-	$::env(CARAVEL_ROOT)/verilog/rtl/defines.v \
-	$script_dir/../../verilog/rtl/user_proj_example.v"
 
-set ::env(EXTRA_LEFS) "\
-	$script_dir/../../lef/user_proj_example.lef"
+## Routing
+set ::env(GLB_RT_MAX_DIODE_INS_ITERS) 3
+set ::env(ROUTING_CORES) 8
 
-set ::env(EXTRA_GDS_FILES) "\
-	$script_dir/../../gds/user_proj_example.gds"
-
-# set ::env(GLB_RT_MAXLAYER) 5
-set ::env(RT_MAX_LAYER) {met4}
-
-# disable pdn check nodes becuase it hangs with multiple power domains.
-# any issue with pdn connections will be flagged with LVS so it is not a critical check.
-set ::env(FP_PDN_CHECK_NODES) 0
-
-# The following is because there are no std cells in the example wrapper project.
-set ::env(SYNTH_TOP_LEVEL) 1
-set ::env(PL_RANDOM_GLB_PLACEMENT) 1
-
-set ::env(PL_RESIZER_DESIGN_OPTIMIZATIONS) 0
-set ::env(PL_RESIZER_TIMING_OPTIMIZATIONS) 0
-set ::env(PL_RESIZER_BUFFER_INPUT_PORTS) 0
-set ::env(PL_RESIZER_BUFFER_OUTPUT_PORTS) 0
-
-set ::env(FP_PDN_ENABLE_RAILS) 0
-
-set ::env(DIODE_INSERTION_STRATEGY) 0
-set ::env(FILL_INSERTION) 0
-set ::env(TAP_DECAP_INSERTION) 0
-set ::env(CLOCK_TREE_SYNTH) 0
-
+##
+set ::env(DIODE_INSERTION_STRATEGY) 3
 
