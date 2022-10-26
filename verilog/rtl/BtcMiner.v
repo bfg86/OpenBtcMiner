@@ -21,15 +21,14 @@ module BtcMiner (
 );
 
 
-  wire [31:0] version;
-  wire [31:0] previous_hash_0;
-  wire [31:0] previous_hash_1;
-  wire [31:0] previous_hash_2;
-  wire [31:0] previous_hash_3;
-  wire [31:0] previous_hash_4;
-  wire [31:0] previous_hash_5;
-  wire [31:0] previous_hash_6;
-  wire [31:0] previous_hash_7;
+  wire [31:0] pre_hash_0;
+  wire [31:0] pre_hash_1;
+  wire [31:0] pre_hash_2;
+  wire [31:0] pre_hash_3;
+  wire [31:0] pre_hash_4;
+  wire [31:0] pre_hash_5;
+  wire [31:0] pre_hash_6;
+  wire [31:0] pre_hash_7;
   wire [31:0] merkle_root_0;
   wire [31:0] merkle_root_1;
   wire [31:0] merkle_root_2;
@@ -64,22 +63,14 @@ module BtcMiner (
     .wbAck          (wb_ack),
     .wbErr          (wb_err),
     .wbRty          (wb_rty),
-    .version        (version),
-    .previous_hash_0(previous_hash_0),
-    .previous_hash_1(previous_hash_1),
-    .previous_hash_2(previous_hash_2),
-    .previous_hash_3(previous_hash_3),
-    .previous_hash_4(previous_hash_4),
-    .previous_hash_5(previous_hash_5),
-    .previous_hash_6(previous_hash_6),
-    .previous_hash_7(previous_hash_7),
-    .merkle_root_0  (merkle_root_0),
-    .merkle_root_1  (merkle_root_1),
-    .merkle_root_2  (merkle_root_2),
-    .merkle_root_3  (merkle_root_3),
-    .merkle_root_4  (merkle_root_4),
-    .merkle_root_5  (merkle_root_5),
-    .merkle_root_6  (merkle_root_6),
+    .pre_hash_0     (pre_hash_0),
+    .pre_hash_1     (pre_hash_1),
+    .pre_hash_2     (pre_hash_2),
+    .pre_hash_3     (pre_hash_3),
+    .pre_hash_4     (pre_hash_4),
+    .pre_hash_5     (pre_hash_5),
+    .pre_hash_6     (pre_hash_6),
+    .pre_hash_7     (pre_hash_7),
     .merkle_root_7  (merkle_root_7),
     .btime          (btime),
     .bits           (bits),
@@ -96,22 +87,14 @@ module BtcMiner (
   BtcMinerCore u_Core (
     .clk            (clk),
     .arst_n_a         (config_enable),
-    .version_a        (version),
-    .previous_hash_a_0(previous_hash_0),
-    .previous_hash_a_1(previous_hash_1),
-    .previous_hash_a_2(previous_hash_2),
-    .previous_hash_a_3(previous_hash_3),
-    .previous_hash_a_4(previous_hash_4),
-    .previous_hash_a_5(previous_hash_5),
-    .previous_hash_a_6(previous_hash_6),
-    .previous_hash_a_7(previous_hash_7),
-    .merkle_root_a_0  (merkle_root_0),
-    .merkle_root_a_1  (merkle_root_1),
-    .merkle_root_a_2  (merkle_root_2),
-    .merkle_root_a_3  (merkle_root_3),
-    .merkle_root_a_4  (merkle_root_4),
-    .merkle_root_a_5  (merkle_root_5),
-    .merkle_root_a_6  (merkle_root_6),
+    .pre_hash_a_0     (pre_hash_0),
+    .pre_hash_a_1     (pre_hash_1),
+    .pre_hash_a_2     (pre_hash_2),
+    .pre_hash_a_3     (pre_hash_3),
+    .pre_hash_a_4     (pre_hash_4),
+    .pre_hash_a_5     (pre_hash_5),
+    .pre_hash_a_6     (pre_hash_6),
+    .pre_hash_a_7     (pre_hash_7),
     .merkle_root_a_7  (merkle_root_7),
     .btime_a          (btime),
     .bits_a           (bits),

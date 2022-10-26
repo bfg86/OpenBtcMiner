@@ -143,9 +143,9 @@ module btcminer_tb;
 		$dumpvars(0, btcminer_tb);
 
 		// Repeat cycles of 1000 clock edges as needed to complete testbench
-		repeat (70) begin
+		repeat (50) begin
 			repeat (1000) @(posedge clock);
-			// $display("+1000 cycles");
+			$display("+1000 cycles");
 		end
 		$display("%c[1;31m",27);
 		`ifdef GL
