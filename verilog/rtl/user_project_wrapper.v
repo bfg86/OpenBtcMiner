@@ -108,6 +108,17 @@ BtcMiner u_Miner (
     .wb_rty    ()
 );
 
+
+/*--------------------------------------*/
+/* Tie off unused I/Os                  */
+/*--------------------------------------*/
+
+assign la_data_out = 128'd0;
+assign io_out      = {`MPRJ_IO_PADS{1'b0}};
+assign io_oeb      = {`MPRJ_IO_PADS{1'b1}};
+assign user_irq    = 3'd0;
+
+
 endmodule	// user_project_wrapper
 
 `default_nettype wire
