@@ -53,7 +53,7 @@ set ::env(SYNTH_MUX4_MAP) ""
 set ::env(SYNTH_MUX_MAP) ""
 set ::env(SYNTH_BUFFERING) 1
 set ::env(SYNTH_SIZING) 1
-set ::env(SYNTH_STRATEGY) {AREA 0}
+set ::env(SYNTH_STRATEGY) {AREA 3}
 
 ## Floorplan
 set ::env(DESIGN_IS_CORE) 1
