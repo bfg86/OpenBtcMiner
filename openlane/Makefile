@@ -16,9 +16,7 @@
 MAKEFLAGS+=--warn-undefined-variables
 
 export OPENLANE_RUN_TAG ?= $(shell date '+%y_%m_%d_%H_%M')
-export CARAVEL_ROOT?=$(PWD)/../caravel
-
-OPENLANE_TAG ?= 2022.07.02_01.38.08
+OPENLANE_TAG ?= 2022.10.20
 OPENLANE_IMAGE_NAME ?= efabless/openlane:$(OPENLANE_TAG)
 designs = $(shell find * -maxdepth 0 -type d)
 current_design = null
@@ -38,13 +36,14 @@ endif
 ifdef OWR
 	openlane_cmd += -overwrite
 endif
+openlane_cmd += -ignore_mismatches
 openlane_cmd += "
 
 openlane_cmd_interactive = "flow.tcl -it -file $$(realpath ./$*/interactive.tcl)"
 
 openlane_cmd_explore = \
 		       "flow.tcl \
-	               -design $$(realpath ./user_project_wrapper) \
+	         -design $$(realpath ./user_project_wrapper) \
 		       -threads 6 \
 		       -tag $(OPENLANE_RUN_TAG) \
 		       -synth_explore \
@@ -81,7 +80,7 @@ list:
 
 .PHONY: $(designs)
 $(designs) : export current_design=$@
-$(designs) : % : ./%/config.tcl
+$(designs) : % : ./%/config.json
 ifneq (,$(wildcard ./$(current_design)/interactive.tcl))
 	$(docker_run) \
 		$(OPENLANE_IMAGE_NAME) sh -c $(openlane_cmd_interactive)
@@ -113,7 +112,7 @@ openlane: check-openlane-env
 		echo "Deleting exisiting $(OPENLANE_ROOT)" && \
 		rm -rf $(OPENLANE_ROOT) && sleep 2; \
 		fi
-	git clone https://github.com/The-OpenROAD-Project/OpenLane --branch=$(OPENLANE_TAG) --depth=1 $(OPENLANE_ROOT) && \
+	git clone https://github.com/The-OpenROAD-Project/OpenLane -b $(OPENLANE_TAG) --depth=1 $(OPENLANE_ROOT) && \
 		cd $(OPENLANE_ROOT) && \
 		export OPENLANE_IMAGE_NAME=efabless/openlane:$(OPENLANE_TAG) && \
 		export IMAGE_NAME=efabless/openlane:$(OPENLANE_TAG) && \
