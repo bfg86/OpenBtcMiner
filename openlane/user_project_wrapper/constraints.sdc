@@ -8,9 +8,9 @@ set_clock_groups -name async_grp -asynchronous -comment "asynch group" \
   -group [get_clock core_clk]
 
 # Clock margins
-puts "\[INFO\]: Setting clock uncertainity to: $::env(SYNTH_CLOCK_UNCERTAINITY)"
-set_clock_uncertainty $::env(SYNTH_CLOCK_UNCERTAINITY) [get_clocks wb_clk]
-set_clock_uncertainty $::env(SYNTH_CLOCK_UNCERTAINITY) [get_clocks core_clk]
+puts "\[INFO\]: Setting clock uncertainity to: $::env(SYNTH_CLOCK_UNCERTAINTY)"
+set_clock_uncertainty $::env(SYNTH_CLOCK_UNCERTAINTY) [get_clocks wb_clk]
+set_clock_uncertainty $::env(SYNTH_CLOCK_UNCERTAINTY) [get_clocks core_clk]
 
 # Clock transition
 puts "\[INFO\]: Setting clock transition to: $::env(SYNTH_CLOCK_TRANSITION)"

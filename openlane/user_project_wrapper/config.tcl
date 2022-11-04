@@ -16,7 +16,7 @@
 # Base Configurations. Don't Touch
 # section begin
 
-set ::env(PDK) $::env(PDK)
+#set ::env(PDK) $::env(PDK)
 set ::env(STD_CELL_LIBRARY) "sky130_fd_sc_hd"
 
 # YOU ARE NOT ALLOWED TO CHANGE ANY VARIABLES DEFINED IN THE FIXED WRAPPER CFGS 
@@ -35,11 +35,11 @@ set ::env(DESIGN_NAME) user_project_wrapper
 ## Source Verilog Files
 set ::env(VERILOG_FILES) "\
 	$::env(CARAVEL_ROOT)/verilog/rtl/defines.v \
-	$script_dir/../../verilog/rtl/user_project_wrapper.v \
-	$script_dir/../../verilog/rtl/BtcMiner.v \
-	$script_dir/../../verilog/rtl/BtcMinerRegs.v \
-	$script_dir/../../verilog/rtl/BtcMinerCore.v \
-	$script_dir/../../verilog/rtl/Sha256Ppl.v"
+	$script_dir/../../../../verilog/rtl/user_project_wrapper.v \
+	$script_dir/../../../../verilog/rtl/BtcMiner.v \
+	$script_dir/../../../../verilog/rtl/BtcMinerRegs.v \
+	$script_dir/../../../../verilog/rtl/BtcMinerCore.v \
+	$script_dir/../../../../verilog/rtl/Sha256Ppl.v"
 
 ## Clock configurations. Note: custom SDC file
 set ::env(CLOCK_PORT) "wb_clk_i"
@@ -65,7 +65,7 @@ set ::env(CELL_PAD) 4
 
 
 ## Routing
-set ::env(GLB_RT_MAX_DIODE_INS_ITERS) 3
+set ::env(GRT_MAX_DIODE_INS_ITERS) 3
 set ::env(ROUTING_CORES) 8
 
 ##
