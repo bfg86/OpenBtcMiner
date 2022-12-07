@@ -32,12 +32,14 @@ Table of contents
 
    -  `Repo Integration <#repo-integration>`__
    -  `Verilog Integration <#verilog-integration>`__
+   -  `GPIO Configuration <#gpio-configuration>`__
    -  `Layout Integration <#layout-integration>`__
 
 -  `Running Full Chip Simulation <#running-full-chip-simulation>`__
 -  `User Project Wrapper Requirements <#user-project-wrapper-requirements>`__
 -  `Hardening the User Project using
    Openlane <#hardening-the-user-project-using-openlane>`__
+-  `Running Timing Analysis on Existing Projects <#running-timing-analysis-on-existing-projects>`__
 -  `Checklist for Open-MPW
    Submission <#checklist-for-open-mpw-submission>`__
 
@@ -72,9 +74,9 @@ Starting your project
    *   Follow https://github.com/efabless/caravel_user_project/generate to create a new repository.
    *   Clone the reposity using the following command:
    
-   .. code:: bash
-    
-	git clone <your github repo URL>
+       .. code:: bash
+        
+    	git clone <your github repo URL>
 	
 #.  To setup your local environment run:
 
@@ -100,12 +102,12 @@ Starting your project
 
         make setup
 
-*   This command will setup your environment by installing the following:
+*   This command will setup your environment by installing the following
     
-        - caravel_lite (a lite version of caravel)
-        - management core for simulation
-        - openlane to harden your design 
-        - pdk
+    - caravel_lite (a lite version of caravel)
+    - management core for simulation
+    - openlane to harden your design 
+    - pdk
 
 	
 #.  Now you can start hardening your design
@@ -114,12 +116,12 @@ Starting your project
         - RTL verilog model for your design for OpenLane to harden
         - A subdirectory for each macro in your project under ``openlane/`` directory, each subdirectory should include openlane configuration files for the macro
 
-	.. code:: bash
+        .. code:: bash
 
-		make <module_name>	
-	..
+           make <module_name>	
+        ..
 
-		For an example of hardening a project please refer to `user_project_example <https://github.com/efabless/caravel_user_project/blob/main/docs/source/index.rst#hardening-the-user-project-using-openlane>`_
+		For an example of hardening a project please refer to `Hardening the User Project using OpenLane`_. .
 	
 #.  Integrate modules into the user_project_wrapper
 
@@ -151,6 +153,28 @@ Starting your project
 
             # for example
             make verify-io_ports-rtl
+
+#.  Run opensta on your design
+
+    *   Extract spefs for ``user_project_wrapper`` and macros inside it:
+
+        .. code:: bash
+
+            make extract-parasitics
+
+    *   Create spef mapping file that maps instance names to spef files:
+
+        .. code:: bash
+
+            make create-spef-mapping
+
+    *   Run opensta:
+
+        .. code:: bash
+
+            make caravel-sta
+
+        **NOTE:** To update timing scripts run ``make setup-timing-scripts``
 	
 #.  Run the precheck locally 
 
@@ -165,6 +189,7 @@ Starting your project
 Caravel Integration
 ===================
 
+----------------
 Repo Integration
 ----------------
 
@@ -189,6 +214,7 @@ corresponding files:
 
 The symbolic links are automatically set when you run ``make install``.
 
+-------------------
 Verilog Integration
 -------------------
 
@@ -223,7 +249,42 @@ for more information.
 
    </p>
 
+-------------------
+GPIO Configuration
+-------------------
 
+You are required to specify the power-on default configuration for each GPIO in Caravel.  The default configuration provide the state the GPIO will come up on power up.  The configuration can be changed by the management SoC during firmware execution.
+
+Configuration settings define whether the GPIO is configured to connect to the user project area or the managment SoC.  They also determine whether IOs are inputs or outputs, digital or analog, as well as whether pull-up or pull-down resistors are configured for inputs.
+
+GPIOs are configured by assigning predefined values for each IO in the file `verilog/rtl/user_defines.v <https://github.com/efabless/caravel_user_project/blob/main/verilog/rtl/user_defines.v>`_ in your project.
+
+You need to assigned configuration values for GPIO[5] thru GPIO[37]. 
+
+GPIO[0] thru GPIO[4] are preset and cannot be changed.
+
+The following values are redefined for assigning to GPIOs.
+
+
+- GPIO_MODE_MGMT_STD_INPUT_NOPULL
+- GPIO_MODE_MGMT_STD_INPUT_PULLDOWN
+- GPIO_MODE_MGMT_STD_INPUT_PULLUP
+- GPIO_MODE_MGMT_STD_OUTPUT
+- GPIO_MODE_MGMT_STD_BIDIRECTIONAL
+- GPIO_MODE_MGMT_STD_ANALOG
+
+- GPIO_MODE_USER_STD_INPUT_NOPULL
+- GPIO_MODE_USER_STD_INPUT_PULLDOWN
+- GPIO_MODE_USER_STD_INPUT_PULLUP
+- GPIO_MODE_USER_STD_OUTPUT
+- GPIO_MODE_USER_STD_BIDIRECTIONAL
+- GPIO_MODE_USER_STD_OUT_MONITORED 
+- GPIO_MODE_USER_STD_ANALOG
+
+
+MPW_Prececk includes a check to confirm each GPIO is assigned a valid value.
+
+-------------------
 Layout Integration
 -------------------
 
@@ -323,6 +384,7 @@ To make sure that you adhere to these requirements, we run an exclusive-or (XOR)
 Hardening the User Project using OpenLane
 ==========================================
 
+---------------------
 OpenLane Installation 
 ---------------------
 
@@ -342,6 +404,7 @@ For detailed instructions on the openlane and the pdk installation refer
 to
 `README <https://github.com/The-OpenROAD-Project/OpenLane#setting-up-openlane>`__.
 
+-----------------
 Hardening Options 
 -----------------
 
@@ -376,7 +439,7 @@ openlane:
 
 For more details on hardening macros using openlane, refer to `README <https://github.com/The-OpenROAD-Project/OpenLane/blob/master/docs/source/hardening_macros.md>`__.
 
-
+-----------------
 Running OpenLane 
 -----------------
 
@@ -429,6 +492,38 @@ Then, you can run the precheck by running
    make run-precheck
 
 This will run all the precheck checks on your project and will produce the logs under the ``checks`` directory.
+
+Running Timing Analysis on Existing Projects
+========================================================
+
+Start by updating the Makefile for your project.  Starting in the project root...
+
+.. code:: bash
+  
+   curl -k https://raw.githubusercontent.com/efabless/caravel_user_project/main/Makefile > Makefile
+   
+   make setup-timing-scripts
+   
+   make install
+   
+   make install_mcw
+   
+
+This will update Caravel design files and install the scripts for running timing. 
+
+
+Then, you can run then run timing by the following...
+
+.. code:: bash
+
+   make extract-parasitics
+   
+   make create-spef-mapping
+   
+   make caravel-sta
+   
+
+A summary of timing results is provided at the end of the flow. 
 
 
 Other Miscellaneous Targets
